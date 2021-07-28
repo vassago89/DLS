@@ -1,0 +1,167 @@
+﻿<UserControl 
+    x:Class="DLS.WPF.Labeling.ImageView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:sys="clr-namespace:System;assembly=System"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:prism="http://prismlibrary.com/"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    xmlns:converters="clr-namespace:DLS.WPF.Converters"
+    xmlns:dxi="http://schemas.devexpress.com/winfx/2008/xaml/core/internal"
+    xmlns:dxt="http://schemas.devexpress.com/winfx/2008/xaml/core/themekeys"
+    xmlns:helper="clr-namespace:DLS.WPF.Helpers">
+    <UserControl.Resources>
+        <converters:StringToBrushConverter x:Key="StringToBrushConverter"/>
+        <converters:IntToDecimalConverter x:Key="IntToDecimalConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:PointsToPointCollectionConverter x:Key="PointsToPointCollectionConverter"/>
+        <helper:BindingProxy x:Key="BindingProxy" Data="{Binding}"/>
+        <DataTemplate x:Key="RectDataTemplate">
+            <Grid Width="{Binding Rect.Width}" Height="{Binding Rect.Height}">
+                <Rectangle  
+                     Fill="{Binding Data.ColorConfig[Common].Value, Source={StaticResource BindingProxy}, Converter={StaticResource StringToBrushConverter}}" 
+                     Opacity="{Binding Data.OpacityConfig[Common].Value, Source={StaticResource BindingProxy}}"
+                     Visibility="{Binding Data.AppConfig.IsFillMode, Source={StaticResource BindingProxy}, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <Rectangle
+                    Stroke="{Binding Data.ColorConfig[Common].Value, Source={StaticResource BindingProxy}, Converter={StaticResource StringToBrushConverter}}"
+                    StrokeDashArray="1 1"
+                    StrokeThickness="{Binding Data.ImageStore.ZoomService.OverlayThickness, Source={StaticResource BindingProxy}}"/>
+                <TextBlock Text="{Binding Name}" FontSize="{Binding Data.ImageStore.ZoomService.FontThickness, Source={StaticResource BindingProxy}}"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="PolygonDataTemplate">
+            <Rectangle 
+                Width="{Binding Rect.Width}"
+                Height="{Binding Rect.Height}" 
+                Fill="Red" 
+                Opacity="0.25"/>
+        </DataTemplate>
+        <DataTemplate x:Key="SelectedRectDataTemplate">
+            <Canvas>
+                <Rectangle 
+                    Width="{Binding Rect.Width}"
+                    Height="{Binding Rect.Height}" 
+                    Fill="{Binding ColorConfig[Select].Value, Converter={StaticResource StringToBrushConverter}}" 
+                    Opacity="{Binding OpacityConfig[Select].Value}"
+                    Visibility="{Binding IsSelectedFillMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <Rectangle 
+                    Width="{Binding Rect.Width}"
+                    Height="{Binding Rect.Height}" 
+                    Stroke="{Binding ColorConfig[Select].Value, Converter={StaticResource StringToBrushConverter}}"
+                    StrokeDashArray="1 1"
+                    StrokeThickness="{Binding ImageStore.ZoomService.OverlayThickness}"/>
+            </Canvas>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <dxb:BarManager ToolbarGlyphSize="Small" DockPanel.Dock="Top">
+            <dxb:BarManager.Bars>
+                <!--<dxb:Bar Caption="File" IsMainMenu="True">
+                    <dxb:BarSubItem x:Name="biFile" Content="File">
+                        <dxb:BarButtonItem x:Name="biFileOpen" Content="Open" Glyph="{dx:DXImage Image=Open_16x16.png}" LargeGlyph="{dx:DXImage Image=Open_32x32.png}" Command="{Binding OpenFileCommand}" />
+                        <dxb:BarButtonItem x:Name="biFileNew" Content="New" Glyph="{dx:DXImage Image=New_16x16.png}" LargeGlyph="{dx:DXImage Image=New_32x32.png}" Command="{Binding NewFileCommand}" />
+                    </dxb:BarSubItem>
+                    <dxb:BarSubItem x:Name="biEdit" Content="Edit">
+                        <dxb:BarButtonItemLink BarItemName="biCut"/>
+                        <dxb:BarButtonItemLink BarItemName="biCopy"/>
+                        <dxb:BarButtonItemLink BarItemName="biPaste"/>
+                    </dxb:BarSubItem>
+                </dxb:Bar>-->
+                <dxb:Bar IsMainMenu="True">
+                    <dxb:Bar.DockInfo>
+                        <dxb:BarDockInfo ContainerType="Right"/>
+                    </dxb:Bar.DockInfo>
+                    <dxb:BarButtonItem ToolTip="Undo" Command="{Binding UndoCommand}" IsEnabled="{Binding CommandStack.CanUndo}" Glyph="{dx:DXImage SvgImages/History/Undo.svg}"/>
+                    <dxb:BarButtonItem ToolTip="Redo" Command="{Binding RedoCommand}" IsEnabled="{Binding CommandStack.CanRedo}" Glyph="{dx:DXImage SvgImages/History/Redo.svg}"/>
+                    <dxb:BarButtonItem ToolTip="Delete" Command="{Binding DeleteCommand}" IsEnabled="{Binding LabelingStore.IsSelected}" Glyph="{dx:DXImage SvgImages/DiagramIcons/del.svg}"/>
+                    <dxb:BarButtonItem ToolTip="Zoom In" Glyph="{dx:DXImage SvgImages/Zoom/ZoomIn.svg}" Command="{Binding ZoomInCommand}" Alignment="Far"/>
+                    <dxb:BarButtonItem ToolTip="Zoom Out" Glyph="{dx:DXImage SvgImages/Zoom/ZoomOut.svg}" Command="{Binding ZoomOutCommand}" Alignment="Far"/>
+                    <dxb:BarButtonItem ToolTip="Zoom Fit" Glyph="{dx:DXImage SvgImages/Zoom/Zoom100.svg}" Command="{Binding ZoomFitCommand}" Alignment="Far"/>
+                    <!--<dxb:BarButtonItem x:Name="biCut" Content="Cut" Glyph="{dx:DXImage Image=Cut_16x16.png}" LargeGlyph="{dx:DXImage Image=Cut_32x32.png}" Command="Cut" />
+                    <dxb:BarButtonItem x:Name="biCopy" Content="Copy" Glyph="{dx:DXImage Image=Copy_16x16.png}" LargeGlyph="{dx:DXImage Image=Copy_32x32.png}" Command="Copy" />
+                    <dxb:BarButtonItem x:Name="biPaste" Content="Paste" Glyph="{dx:DXImage Image=Paste_16x16.png}" LargeGlyph="{dx:DXImage Image=Paste_32x32.png}" Command="Paste"/>
+                    <dxb:BarItemSeparator/>
+                    <dxb:BarStaticItem Content="Skip"/>
+                    <dxb:BarEditItem EditWidth="100" EditValue="{Binding AppConfig.SkipFrame, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource IntToDecimalConverter}}">
+                        <dxb:BarEditItem.EditSettings>
+                            <dxe:SpinEditSettings MinValue="-100" MaxValue="100"/>
+                        </dxb:BarEditItem.EditSettings>
+                    </dxb:BarEditItem>
+                    <dxb:BarCheckItem x:Name="biBold" Content="Bold" Glyph="{dx:DXImage Image=Bold_16x16.png}" LargeGlyph="{dx:DXImage Image=Bold_32x32.png}" IsChecked="{Binding IsBold, Mode=TwoWay}"/>
+                    <dxb:BarCheckItem x:Name="biItalic" Content="Italic" Glyph="{dx:DXImage Image=Italic_16x16.png}" LargeGlyph="{dx:DXImage Image=Italic_32x32.png}" IsChecked="{Binding IsItalic, Mode=TwoWay}"/>
+                    <dxb:BarCheckItem x:Name="biUnderline" Content="Underline" Glyph="{dx:DXImage Image=Underline_16x16.png}" LargeGlyph="{dx:DXImage Image=Underline_32x32.png}" IsChecked="{Binding IsUnderline, Mode=TwoWay}"/>-->
+                </dxb:Bar>
+                <dxb:Bar IsStatusBar="True">
+                    <dxb:Bar.DockInfo>
+                        <dxb:BarDockInfo ContainerType="Bottom"/>
+                    </dxb:Bar.DockInfo>
+                    <dxb:BarStaticItem Content="Frame"/>
+                    <dxb:BarStaticItem Content="{Binding ImageStore.Frame}"/>
+                    <dxb:BarStaticItem Content="/"/>
+                    <dxb:BarStaticItem Content="{Binding ImageStore.TotalFrame}"/>
+                    <!--<dxb:BarCheckItem x:Name="biLeft" Alignment="Far" Glyph="{dx:DXImage Image=AlignLeft_16x16.png}" GroupIndex="1" IsChecked="True" Command="{Binding SetAlignmentCommand}" CommandParameter="{x:Static TextAlignment.Left}" />
+                    <dxb:BarCheckItem x:Name="biCenter" Alignment="Far" Glyph="{dx:DXImage Image=AlignCenter_16x16.png}" GroupIndex="1" Command="{Binding SetAlignmentCommand}" CommandParameter="{x:Static TextAlignment.Center}" />
+                    <dxb:BarCheckItem x:Name="biRight" Alignment="Far" Glyph="{dx:DXImage Image=AlignRight_16x16.png}" GroupIndex="1" Command="{Binding SetAlignmentCommand}" CommandParameter="{x:Static TextAlignment.Right}" />-->
+                    <dxb:BarStaticItem Content="{Binding ImageStore.FilePath}" Alignment="Far"/>
+                </dxb:Bar>
+            </dxb:BarManager.Bars>
+            <Grid Margin="4">
+                <Border ClipToBounds="True"
+                        Background="Transparent"
+                        PreviewMouseWheel="Border_PreviewMouseWheel"
+                        MouseDown="Border_PreviewMouseDown"
+                        MouseMove="Border_PreviewMouseMove"
+                        PreviewMouseUp="Border_PreviewMouseUp"
+                        MouseLeave="Border_MouseLeave"
+                        BorderBrush="{dxi:ThemeResource {dxt:PaletteBrushThemeKey ResourceKey=Border}}"
+                        BorderThickness="2"
+                        x:Name="Border">
+                    <Canvas x:Name="Canvas">
+                        <Canvas.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform ScaleX="{Binding ImageStore.ZoomService.Scale}" ScaleY="{Binding ImageStore.ZoomService.Scale}"/>
+                                <TranslateTransform X="{Binding ImageStore.ZoomService.TranslateX}" Y="{Binding ImageStore.ZoomService.TranslateY}"/>
+                            </TransformGroup>
+                        </Canvas.RenderTransform>
+                        <Image Source="{Binding ImageStore.Source}"/>
+                        <Canvas>
+                            <ItemsControl ItemsSource="{Binding LabelingStore.LabelingDatas}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="Canvas.Left" Value="{Binding Path=Rect.X}" />
+                                        <Setter Property="Canvas.Top" Value="{Binding Path=Rect.Y}" />
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplateSelector>
+                                    <helper:LabelingDataTemplateSelector/>
+                                </ItemsControl.ItemTemplateSelector>
+                            </ItemsControl>
+                            <ContentPresenter Content="{Binding LabelingStore.Selected}"
+                                              Canvas.Left="{Binding Rect.X}"
+                                              Canvas.Top="{Binding Rect.Y}">
+                                <ContentPresenter.ContentTemplateSelector>
+                                    <helper:SelectedLabelingDataTemplateSelector/>
+                                </ContentPresenter.ContentTemplateSelector>
+                            </ContentPresenter>
+                            <Rectangle Width="{Binding CurRect.Width}" Height="{Binding CurRect.Height}" Canvas.Left="{Binding CurRect.X}" Canvas.Top="{Binding CurRect.Y}" Stroke="Yellow" StrokeDashArray="1 1" StrokeThickness="{Binding ImageStore.ZoomService.OverlayThickness}" Visibility="{Binding SettingStore.IsRectMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <Polygon Points="{Binding CurPoints, Converter={StaticResource PointsToPointCollectionConverter}}" Stroke="Yellow" StrokeDashArray="1 1" StrokeThickness="{Binding ImageStore.ZoomService.OverlayThickness}" Visibility="{Binding SettingStore.IsPolygonMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        </Canvas>
+                    </Canvas>
+                </Border>
+                <!--<Border BorderBrush="{dxi:ThemeResource {dxt:PaletteBrushThemeKey ResourceKey=Border}}" BorderThickness="2" Visibility="{Binding IsFocused, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                <Border BorderBrush="Red" BorderThickness="2" Visibility="{Binding IsFocused, Converter={StaticResource BoolToVisibilityConverter}}"/>-->
+            </Grid>
+        </dxb:BarManager>
+    </Grid>
+</UserControl>

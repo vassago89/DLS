@@ -1,0 +1,76 @@
+﻿<dxr:RibbonControl
+    x:Class="DLS.WPF.Shell.RibbonView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" 
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars" 
+    xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+    xmlns:prism="http://prismlibrary.com/"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+    xmlns:converters="clr-namespace:DLS.WPF.Converters"
+    prism:ViewModelLocator.AutoWireViewModel="True"
+    xmlns:labeling="clr-namespace:DLS.WPF.Labeling"
+    AllowCustomization="False">
+    <dxr:RibbonControl.Resources>
+        <converters:IntToDecimalConverter x:Key="IntToDecimalConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </dxr:RibbonControl.Resources>
+    <dxr:RibbonDefaultPageCategory>
+        <dxr:RibbonPage Caption="Labeling">
+            <dxr:RibbonPage.Tag>
+                <labeling:LabelingView/>
+            </dxr:RibbonPage.Tag>
+            <dxr:RibbonPageGroup IsCaptionButtonEnabled="True">
+                <dxb:BarButtonItem Content="New" Glyph="{dx:DXImage SvgImages/Actions/New.svg}" Command="{Binding NewDatabaseCommand}"/>
+                <dxb:BarButtonItem Content="Edit" Glyph="{dx:DXImage SvgImages/Edit/Copy.svg}" Command="{Binding EditDatabaseCommand}"/>
+                <dxb:BarButtonItem Content="Export" Glyph="{dx:DXImage SvgImages/Export/Export.svg}" Command="{Binding ExportDatabaseCommand}"/>
+                <dxb:BarItemSeparator/>
+                <!--<dxr:BarButtonGroup>
+                    <dxb:BarCheckItem IsChecked="{Binding SettingStore.IsSkipMode}" Content="Skip" GroupIndex="0" Glyph="{dx:DXImage SvgImages/Icon Builder/Actions_Next.svg}"/>
+                    <dxb:BarCheckItem IsChecked="{Binding SettingStore.IsLabelingMode}" Content="Labeling" GroupIndex="0" Glyph="{dx:DXImage SvgImages/XAF/Action_Inline_Edit.svg}"/>
+                </dxr:BarButtonGroup>
+                <dxb:BarItemSeparator/>-->
+                <dxr:BarButtonGroup IsEnabled="{Binding ImageStore.IsOpened}">
+                    <dxb:BarCheckItem IsChecked="{Binding SettingStore.IsRectMode}" Content="Rect" GroupIndex="0" Glyph="{dx:DXImage SvgImages/XAF/Action_CloneMerge_Merge_Object.svg}"/>
+                    <dxb:BarCheckItem IsChecked="{Binding SettingStore.IsPolygonMode}" Content="Polygon" GroupIndex="0" Glyph="{dx:DXImage SvgImages/DiagramIcons/connector.svg}"/>
+                    <dxb:BarCheckItem IsChecked="{Binding SettingStore.IsPenMode}" Content="Pen" GroupIndex="0" Glyph="{dx:DXImage SvgImages/DiagramIcons/brush.svg}"/>
+                    <dxb:BarItemSeparator/>
+                    <dxb:BarButtonItem Content="Prev" Glyph="{dx:DXImage SvgImages/Arrows/Prev.svg}" Command="{Binding PrevFrameCommand}"/>
+                    <dxb:BarButtonItem Content="Next" Glyph="{dx:DXImage SvgImages/Arrows/Next.svg}" Command="{Binding NextFrameCommand}"/>
+                    <dxb:BarItemSeparator/>
+                    <dxb:BarStaticItem Content="Skip"/>
+                    <dxb:BarEditItem EditWidth="100" EditValue="{Binding AppConfig.SkipFrame, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource IntToDecimalConverter}}">
+                        <dxb:BarEditItem.EditSettings>
+                            <dxe:SpinEditSettings MinValue="-100" MaxValue="100"/>
+                        </dxb:BarEditItem.EditSettings>
+                    </dxb:BarEditItem>
+                </dxr:BarButtonGroup>
+                <dxb:BarItemSeparator/>
+            </dxr:RibbonPageGroup>
+        </dxr:RibbonPage>
+        <dxr:RibbonPage Caption="Analysis">
+        </dxr:RibbonPage>
+        <dxr:RibbonPage Caption="Setting">
+            <dxr:RibbonPageGroup>
+                <dxb:BarButtonItem Content="New" Glyph="{dx:DXImage SvgImages/Actions/New.svg}" />
+                <dxb:BarButtonItem Content="Edit" Glyph="{dx:DXImage SvgImages/Edit/Copy.svg}" />
+                <dxb:BarButtonItem Content="Export" Glyph="{dx:DXImage SvgImages/Export/Export.svg}" />
+                <dxb:BarItemSeparator />
+                <dxr:BarButtonGroup>
+                    <dxb:BarEditItem EditSettings="{dxe:ComboBoxSettings}" EditWidth="80" />
+                </dxr:BarButtonGroup>
+                <dxr:BarButtonGroup>
+                    <dxb:BarCheckItem Content="Align Left" GroupIndex="1" IsChecked="True" Glyph="{dx:DXImage SvgImages/DiagramIcons/connector.svg}" />
+                    <dxb:BarCheckItem Content="Align Right" Glyph="{dx:DXImage 'SvgImages/Format/AlignRight.svg'}" GroupIndex="1" />
+                    <dxb:BarCheckItem Content="Align Justify" Glyph="{dx:DXImage 'SvgImages/Format/AlignJustify.svg'}" GroupIndex="1" />
+                </dxr:BarButtonGroup>
+                <dxb:BarItemSeparator />
+                <dxb:BarButtonItem Content="Save As" LargeGlyph="{dx:DXImage 'SvgImages/Save/SaveAs.svg'}" />
+            </dxr:RibbonPageGroup>
+        </dxr:RibbonPage>
+    </dxr:RibbonDefaultPageCategory>
+</dxr:RibbonControl>
